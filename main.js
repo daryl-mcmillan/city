@@ -4,7 +4,7 @@ import AggregateArray from './data/AggregateArray.js';
 import GameTimer from './sim/GameTimer.js';
 import {animate} from './ui/misc.js';
 import Map from './sim/Map.js';
-import Canvas from './ui/Canvas.js';
+import GLCanvas from './ui/GLCanvas.js';
 
 const xAxis = new AggregateArray();
 const yAxis = new AggregateArray();
@@ -32,11 +32,15 @@ for( var i=0; i<5000; i++ ) {
 	people.push( {
 		lastUpdate: 0,
 		position: { x: Math.random() * 100, y: Math.random() * 100 },
-		velocity: { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 }
+		velocity: { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1 },
+		color: { r: 0.0, g: 0.0, b: 0.0 }
 	} );
 }
 
 people.forEach( p => map.add( p ) );
+
+const canvas = new GLCanvas( document.body );
+canvas.setData( people );
 
 async function entityLoop() {
 	for( ;; ) {
@@ -49,7 +53,7 @@ async function entityLoop() {
 			const p = people[i];
 			const dt = time - p.lastUpdate;
 			p.lastUpdate = time;
-			p.color = "black";
+			p.color = { r:0, g:0, b:0 };
 			p.position.x += p.velocity.x * dt;
 			p.position.y += p.velocity.y * dt;
 			map.update( p );
@@ -60,9 +64,10 @@ async function entityLoop() {
 			y: firstPerson.position.y + firstPerson.velocity.y * 2
 		};
 		map.getNearby( lookPosition ).forEach( p => {
-			p.color = "red";
+			p.color = {r:1,g:0,b:0};
 		} );
-		firstPerson.color = "green";
+		firstPerson.color = {r:0,g:1,b:0};
+		canvas.setData( people );
 	}
 }
 
@@ -92,8 +97,6 @@ function box() {
 }
 
 async function run() {
-	
-	const canvas = new Canvas( document.body );
 
 	const targetVelocity = { x: 0, y: 0 };
 	const velocity = { x: 0, y: 0 };
@@ -102,11 +105,6 @@ async function run() {
 	animate( t => {
 		var time = timer.currentTime();
 		canvas.clear();
-		for( var i=0; i<people.length; i++ ) {
-			const person = people[i];
-			const dt = time - person.lastUpdate;
-			canvas.dot( person.position.x + person.velocity.x * dt, person.position.y + person.velocity.y * dt, person.color );
-		}
 		canvas.dot( position.x, position.y, "green" );
 		//document.body.innerText = JSON.stringify( position );
 	} );
