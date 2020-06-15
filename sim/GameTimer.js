@@ -3,7 +3,8 @@ import {sleep} from '../lib/misc.js';
 export default class GameTimer {
 	constructor( stepMilliseconds ) {
 		this._stepMs = stepMilliseconds;
-		this._currentTime = 0;
+		this._stepSeconds = stepMilliseconds / 1000;
+		this._currentTimeSeconds = 0;
 		this._lastStart = performance.now();
 		this._idleMs = 0;
 		this._statsStart = performance.now();
@@ -18,11 +19,11 @@ export default class GameTimer {
 			await sleep( 0 );
 			this._lastStart = performance.now();
 		}
-		this._currentTime += this._stepMs;
-		return this._stepMs;
+		this._currentTimeSeconds += this._stepSeconds;
+		return this._stepSeconds;
 	}
 	currentTime() {
-		return this._currentTime;
+		return this._currentTimeSeconds;
 	}
 	getStats() {
 		const currentTime = performance.now();
